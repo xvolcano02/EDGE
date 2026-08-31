@@ -1,0 +1,654 @@
+{
+  "version": 2,
+  "metadata": {
+    "env": "alfworld",
+    "updated_step": 0,
+    "source_banks": [
+      "state_aware_experiences_v2.json",
+      "claude_style_experiences.json"
+    ],
+    "merge_note": "Merged claude_style_experiences general experiences, task-specific experiences, and common mistakes into state-aware experience schema.",
+    "old_bank_metadata": {
+      "source": "generated from ALFWorld trajectories using o3",
+      "total_memories_analyzed": 223,
+      "task_distribution": {
+        "pick_and_place": {
+          "success": 41,
+          "failure": 35
+        },
+        "look_at_obj_in_light": {
+          "success": 12,
+          "failure": 9
+        },
+        "clean": {
+          "success": 17,
+          "failure": 19
+        },
+        "heat": {
+          "success": 14,
+          "failure": 18
+        },
+        "cool": {
+          "success": 19,
+          "failure": 16
+        },
+        "examine": {
+          "success": 10,
+          "failure": 13
+        }
+      }
+    },
+    "experience_count": 29,
+    "validation_source": "agent-trajectories/val-trajectories/val_190.jsonl",
+    "validation_analysis_note": "Pruned and revised using 128 validation trajectories at global_step 190; emphasized exact admissible actions, move-to-receptacle syntax, loop recovery, and post-state-change delivery."
+  },
+  "experiences": [
+    {
+      "experience_id": "exp_000001",
+      "task_type": "general",
+      "trigger": "the model is about to output an action after reasoning",
+      "recommended_action": "copy one exact string from the current admissible actions list into the action tag",
+      "avoid_action": "emit free-form explanation, omit the action tag, or invent a shortened action string",
+      "expected_effect": "the environment accepts the action instead of returning an invalid parse or Nothing happens",
+      "state_cues": [
+        "admissible actions list visible",
+        "action tag required",
+        "previous output caused invalid action"
+      ],
+      "retrieval_text": "exact admissible action string action tag avoid parse failure nothing happens",
+      "evidence": {
+        "positive_gain_count": 0,
+        "negative_gain_count": 0,
+        "source_traj_uids": [],
+        "last_updated_step": null
+      }
+    },
+    {
+      "experience_id": "exp_000002",
+      "task_type": "general",
+      "trigger": "the last observation says Nothing happens after a go/open/examine/take action",
+      "recommended_action": "treat the previous action as unproductive and choose a different admissible action that changes location, opens a new container, takes a visible target, or completes the next subgoal",
+      "avoid_action": "repeat the same action or keep examining the same object without new state",
+      "expected_effect": "the agent escapes loops that consumed many failed validation episodes",
+      "state_cues": [
+        "Nothing happens",
+        "same action available again",
+        "no new object or state observed",
+        "step budget being consumed"
+      ],
+      "retrieval_text": "nothing happens do not repeat same action choose new admissible action loop recovery",
+      "evidence": {
+        "positive_gain_count": 0,
+        "negative_gain_count": 0,
+        "source_traj_uids": [],
+        "last_updated_step": null
+      }
+    },
+    {
+      "experience_id": "exp_000003",
+      "task_type": "general",
+      "trigger": "current observation shows a closed plausible container and the target is not yet found",
+      "recommended_action": "open the closed container once, then inspect or move on according to the contents",
+      "avoid_action": "assume the closed container is empty or repeatedly open an already-open container",
+      "expected_effect": "the container contents become visible or the location is ruled out without looping",
+      "state_cues": [
+        "closed drawer/cabinet/fridge/microwave",
+        "open action admissible",
+        "target object missing"
+      ],
+      "retrieval_text": "closed container target missing open once inspect contents avoid repeated open",
+      "evidence": {
+        "positive_gain_count": 0,
+        "negative_gain_count": 0,
+        "source_traj_uids": [],
+        "last_updated_step": null
+      }
+    },
+    {
+      "experience_id": "exp_000004",
+      "task_type": "general",
+      "trigger": "a visible object exactly matches the target object type and a take action is admissible",
+      "recommended_action": "take the exact visible target object immediately",
+      "avoid_action": "take a look-alike or unrelated object, or leave the target behind to search elsewhere",
+      "expected_effect": "the target becomes held and the next subgoal can be transformation or delivery",
+      "state_cues": [
+        "goal object visible",
+        "take action admissible",
+        "inventory not holding target",
+        "exact object type matches goal"
+      ],
+      "retrieval_text": "visible exact target take immediately avoid wrong object leave behind",
+      "evidence": {
+        "positive_gain_count": 0,
+        "negative_gain_count": 0,
+        "source_traj_uids": [],
+        "last_updated_step": null
+      }
+    },
+    {
+      "experience_id": "exp_000005",
+      "task_type": "general",
+      "trigger": "inventory is holding a goal object and the destination receptacle is reachable or visible",
+      "recommended_action": "navigate to the destination if needed, then use the admissible move <object> to <receptacle> action",
+      "avoid_action": "say put/drop/place when the environment only admits move, or continue searching while holding the object",
+      "expected_effect": "the held object is placed in the required receptacle using the environment's actual action format",
+      "state_cues": [
+        "inventory contains target",
+        "destination receptacle known or visible",
+        "move action admissible",
+        "task says put/place"
+      ],
+      "retrieval_text": "holding target destination visible use move object to receptacle not put",
+      "evidence": {
+        "positive_gain_count": 0,
+        "negative_gain_count": 0,
+        "source_traj_uids": [],
+        "last_updated_step": null
+      }
+    },
+    {
+      "experience_id": "exp_000006",
+      "task_type": "general",
+      "trigger": "the task requires two or more instances of the same target object",
+      "recommended_action": "after each successful move to the destination, decrement the remaining count and search only for the missing instances",
+      "avoid_action": "move the same instance repeatedly, stop after one item, or keep searching after the required count is complete",
+      "expected_effect": "multi-object tasks progress by object count instead of repeated redundant moves",
+      "state_cues": [
+        "task says two or multiple",
+        "one instance already moved",
+        "remaining count above zero",
+        "same object still visible at destination"
+      ],
+      "retrieval_text": "multi instance count moved objects remaining count avoid moving same object repeatedly",
+      "evidence": {
+        "positive_gain_count": 0,
+        "negative_gain_count": 0,
+        "source_traj_uids": [],
+        "last_updated_step": null
+      }
+    },
+    {
+      "experience_id": "exp_000007",
+      "task_type": "general",
+      "trigger": "a required object has already been moved to the goal receptacle and appears there in later observations",
+      "recommended_action": "count that object as completed and do not take it back out unless the task state must be corrected",
+      "avoid_action": "retrieve the completed object from the destination and redo the same subgoal",
+      "expected_effect": "the agent preserves achieved progress and uses remaining steps for unmet objects or states",
+      "state_cues": [
+        "object visible in destination",
+        "previous move succeeded",
+        "goal count partly satisfied",
+        "tempted to take object from destination"
+      ],
+      "retrieval_text": "object already at destination count as completed do not take back out",
+      "evidence": {
+        "positive_gain_count": 0,
+        "negative_gain_count": 0,
+        "source_traj_uids": [],
+        "last_updated_step": null
+      }
+    },
+    {
+      "experience_id": "exp_000008",
+      "task_type": "general",
+      "trigger": "the agent has examined or visited the same location several times with no new contents",
+      "recommended_action": "mark that location as searched and switch to an unvisited surface or unopened container",
+      "avoid_action": "keep using examine/go on the same location after identical observations",
+      "expected_effect": "search coverage expands instead of stalling at the 50-step limit",
+      "state_cues": [
+        "repeated examine action",
+        "identical observation",
+        "unvisited locations remain",
+        "target not found"
+      ],
+      "retrieval_text": "repeated examine identical observation mark searched move to unvisited location",
+      "evidence": {
+        "positive_gain_count": 0,
+        "negative_gain_count": 0,
+        "source_traj_uids": [],
+        "last_updated_step": null
+      }
+    },
+    {
+      "experience_id": "exp_000009",
+      "task_type": "general",
+      "trigger": "the goal contains a state word such as clean, hot, or cool",
+      "recommended_action": "parse it as a required object-state predicate and route to sinkbasin, microwave, or fridge before final move",
+      "avoid_action": "treat hot/cool/clean as ordinary pick-and-place and move the object before transformation",
+      "expected_effect": "state-changing tasks satisfy the property predicate before final placement",
+      "state_cues": [
+        "goal says clean",
+        "goal says hot",
+        "goal says cool",
+        "state appliance exists",
+        "held target object"
+      ],
+      "retrieval_text": "state word clean hot cool requires sinkbasin microwave fridge before final move",
+      "evidence": {
+        "positive_gain_count": 0,
+        "negative_gain_count": 0,
+        "source_traj_uids": [],
+        "last_updated_step": null
+      }
+    },
+    {
+      "experience_id": "exp_000010",
+      "task_type": "pick_and_place",
+      "trigger": "target object is visible on a surface or inside an opened container",
+      "recommended_action": "take the target, then deliver it with move <object> to <destination> once the destination is reached",
+      "avoid_action": "inspect unrelated objects after seeing the target or use a non-admissible put command",
+      "expected_effect": "simple placement tasks complete in the shortest target-acquire-deliver sequence",
+      "state_cues": [
+        "pick_and_place task",
+        "target visible",
+        "take action admissible",
+        "destination known"
+      ],
+      "retrieval_text": "pick and place visible target take then move to destination",
+      "evidence": {
+        "positive_gain_count": 0,
+        "negative_gain_count": 0,
+        "source_traj_uids": [],
+        "last_updated_step": null
+      }
+    },
+    {
+      "experience_id": "exp_000011",
+      "task_type": "pick_and_place",
+      "trigger": "the desired object is commonly found in receptacles or furniture near the current room context",
+      "recommended_action": "search plausible surfaces first, then unopened containers; after each empty observation choose a new candidate",
+      "avoid_action": "bounce between the same two surfaces or repeatedly examine empty furniture",
+      "expected_effect": "the agent finds hidden or less obvious targets without wasting the full episode",
+      "state_cues": [
+        "target not visible",
+        "many surfaces or containers available",
+        "empty observation",
+        "unvisited candidate exists"
+      ],
+      "retrieval_text": "pick and place systematic search plausible surfaces unopened containers no bounce loop",
+      "evidence": {
+        "positive_gain_count": 0,
+        "negative_gain_count": 0,
+        "source_traj_uids": [],
+        "last_updated_step": null
+      }
+    },
+    {
+      "experience_id": "exp_000012",
+      "task_type": "pick_and_place",
+      "trigger": "the destination is itself a container such as drawer, cabinet, microwave, or fridge",
+      "recommended_action": "open the destination if needed, then move the held object to it when the move action appears",
+      "avoid_action": "stand at a closed destination and repeatedly examine/open after the object is already ready",
+      "expected_effect": "the destination becomes able to receive the object and placement succeeds",
+      "state_cues": [
+        "destination container",
+        "holding target",
+        "open destination action admissible",
+        "move action appears after opening"
+      ],
+      "retrieval_text": "destination container open then move held object drawer cabinet microwave fridge",
+      "evidence": {
+        "positive_gain_count": 0,
+        "negative_gain_count": 0,
+        "source_traj_uids": [],
+        "last_updated_step": null
+      }
+    },
+    {
+      "experience_id": "exp_000013",
+      "task_type": "pick_and_place",
+      "trigger": "an object with the same type is already present at the destination before pickup",
+      "recommended_action": "use it as progress evidence only if it satisfies the target count; otherwise search for additional instances",
+      "avoid_action": "ignore already placed matching objects or move them away from the destination",
+      "expected_effect": "multi-object goals avoid unnecessary removal and count existing valid placements correctly",
+      "state_cues": [
+        "matching object visible at destination",
+        "multi-instance task",
+        "remaining count uncertain"
+      ],
+      "retrieval_text": "matching object already at destination count progress search additional instances",
+      "evidence": {
+        "positive_gain_count": 0,
+        "negative_gain_count": 0,
+        "source_traj_uids": [],
+        "last_updated_step": null
+      }
+    },
+    {
+      "experience_id": "exp_000014",
+      "task_type": "pick_clean_then_place_in_recep",
+      "trigger": "holding the exact object that must be cleaned and a sinkbasin is reachable",
+      "recommended_action": "go to the sinkbasin and execute clean <object> with sinkbasin exactly once when admissible",
+      "avoid_action": "clean a different held object or keep examining the sinkbasin after the exact target is available",
+      "expected_effect": "the target receives the clean state before delivery",
+      "state_cues": [
+        "clean task",
+        "inventory contains exact target",
+        "sinkbasin known",
+        "clean action admissible"
+      ],
+      "retrieval_text": "clean exact held target with sinkbasin once before delivery",
+      "evidence": {
+        "positive_gain_count": 0,
+        "negative_gain_count": 0,
+        "source_traj_uids": [],
+        "last_updated_step": null
+      }
+    },
+    {
+      "experience_id": "exp_000015",
+      "task_type": "pick_clean_then_place_in_recep",
+      "trigger": "the observation confirms You clean the target using the sinkbasin",
+      "recommended_action": "navigate directly to the destination and move the cleaned object there",
+      "avoid_action": "repeat cleaning, switch to another object, or cool/heat the object by mistake",
+      "expected_effect": "the already-clean object is delivered instead of losing progress in state loops",
+      "state_cues": [
+        "You clean the object using sinkbasin",
+        "clean state achieved",
+        "destination known",
+        "move action needed"
+      ],
+      "retrieval_text": "after clean confirmation go destination move object avoid repeat clean wrong appliance",
+      "evidence": {
+        "positive_gain_count": 0,
+        "negative_gain_count": 0,
+        "source_traj_uids": [],
+        "last_updated_step": null
+      }
+    },
+    {
+      "experience_id": "exp_000016",
+      "task_type": "pick_clean_then_place_in_recep",
+      "trigger": "the model is holding an object whose type differs from the clean-task target",
+      "recommended_action": "drop or ignore the wrong object and resume searching for the exact named target",
+      "avoid_action": "clean the wrong object just because a clean action is available",
+      "expected_effect": "the state change is applied to the object named in the goal, not to a distractor",
+      "state_cues": [
+        "clean task",
+        "held object type mismatches goal",
+        "distractor object in inventory",
+        "exact target not completed"
+      ],
+      "retrieval_text": "clean task wrong held object do not clean distractor exact target only",
+      "evidence": {
+        "positive_gain_count": 0,
+        "negative_gain_count": 0,
+        "source_traj_uids": [],
+        "last_updated_step": null
+      }
+    },
+    {
+      "experience_id": "exp_000017",
+      "task_type": "pick_heat_then_place_in_recep",
+      "trigger": "holding the exact object that must become hot and a microwave is reachable",
+      "recommended_action": "go to the microwave, open it if needed, then execute heat <object> with microwave when admissible",
+      "avoid_action": "heat a distractor object or go to the final receptacle before heating the target",
+      "expected_effect": "the target obtains the heated state before final placement",
+      "state_cues": [
+        "hot task",
+        "inventory contains exact target",
+        "microwave known",
+        "heat action admissible"
+      ],
+      "retrieval_text": "hot heat exact held target with microwave before final move",
+      "evidence": {
+        "positive_gain_count": 0,
+        "negative_gain_count": 0,
+        "source_traj_uids": [],
+        "last_updated_step": null
+      }
+    },
+    {
+      "experience_id": "exp_000018",
+      "task_type": "pick_heat_then_place_in_recep",
+      "trigger": "the observation confirms You heat the target using the microwave",
+      "recommended_action": "go directly to the destination and move the heated target there",
+      "avoid_action": "return to the microwave, search unrelated surfaces, or heat another object",
+      "expected_effect": "the heated object is delivered while the state predicate is fresh and progress is preserved",
+      "state_cues": [
+        "You heat the object using microwave",
+        "heated state achieved",
+        "destination known",
+        "move action needed"
+      ],
+      "retrieval_text": "after heat confirmation direct destination move heated target no detour",
+      "evidence": {
+        "positive_gain_count": 0,
+        "negative_gain_count": 0,
+        "source_traj_uids": [],
+        "last_updated_step": null
+      }
+    },
+    {
+      "experience_id": "exp_000019",
+      "task_type": "pick_heat_then_place_in_recep",
+      "trigger": "a microwave or final receptacle is visible but the exact target object is not held",
+      "recommended_action": "search for and take the exact target before using the microwave or destination",
+      "avoid_action": "interact with appliances first or substitute another object of a different type",
+      "expected_effect": "the heating sequence starts only after the correct target is controlled",
+      "state_cues": [
+        "hot task",
+        "microwave visible",
+        "inventory missing exact target",
+        "candidate distractors visible"
+      ],
+      "retrieval_text": "hot task exact target first no appliance before object no substitute",
+      "evidence": {
+        "positive_gain_count": 0,
+        "negative_gain_count": 0,
+        "source_traj_uids": [],
+        "last_updated_step": null
+      }
+    },
+    {
+      "experience_id": "exp_000020",
+      "task_type": "pick_cool_then_place_in_recep",
+      "trigger": "holding the exact object that must become cool and a fridge is reachable",
+      "recommended_action": "go to the fridge, open it if needed, then execute cool <object> with fridge when admissible",
+      "avoid_action": "move the object to the final receptacle before cooling or repeatedly go to the fridge without cooling",
+      "expected_effect": "the target receives the cooled state and is ready for final delivery",
+      "state_cues": [
+        "cool task",
+        "inventory contains exact target",
+        "fridge known",
+        "cool action admissible"
+      ],
+      "retrieval_text": "cool exact held target with fridge before final move avoid fridge loop",
+      "evidence": {
+        "positive_gain_count": 0,
+        "negative_gain_count": 0,
+        "source_traj_uids": [],
+        "last_updated_step": null
+      }
+    },
+    {
+      "experience_id": "exp_000021",
+      "task_type": "pick_cool_then_place_in_recep",
+      "trigger": "the observation confirms You cool the target using the fridge",
+      "recommended_action": "navigate directly to the destination and use move <object> to <destination>",
+      "avoid_action": "cool the same object again, take it back from the destination, or return to the fridge after successful cooling",
+      "expected_effect": "the cooled object is delivered without entering the repeated fridge loop seen in failed validation episodes",
+      "state_cues": [
+        "You cool the object using fridge",
+        "cooled state achieved",
+        "destination known",
+        "move action needed"
+      ],
+      "retrieval_text": "after cool confirmation direct destination move cooled target no repeat fridge",
+      "evidence": {
+        "positive_gain_count": 0,
+        "negative_gain_count": 0,
+        "source_traj_uids": [],
+        "last_updated_step": null
+      }
+    },
+    {
+      "experience_id": "exp_000022",
+      "task_type": "pick_cool_then_place_in_recep",
+      "trigger": "the target object is visible inside or near the fridge during a cool task",
+      "recommended_action": "use the exact admissible take <object> from <source> action, then still execute cool <object> with fridge if the goal is unmet",
+      "avoid_action": "invent actions like take cool object from fridge or assume fridge location alone completes cooling",
+      "expected_effect": "the object is controlled with a valid action and receives explicit cooling before placement",
+      "state_cues": [
+        "cool task",
+        "target in fridge or near fridge",
+        "take action listed",
+        "cool action still required"
+      ],
+      "retrieval_text": "cool task take exact object not take cool object explicit cool with fridge",
+      "evidence": {
+        "positive_gain_count": 0,
+        "negative_gain_count": 0,
+        "source_traj_uids": [],
+        "last_updated_step": null
+      }
+    },
+    {
+      "experience_id": "exp_000023",
+      "task_type": "pick_cool_then_place_in_recep",
+      "trigger": "the agent repeatedly goes to fridge, opens fridge, or examines fridge while not holding the target",
+      "recommended_action": "leave the fridge area and search unvisited likely source locations for the exact target object",
+      "avoid_action": "stay at the fridge expecting the target to appear after repeated open/examine/go actions",
+      "expected_effect": "the agent escapes fridge fixation and resumes object acquisition",
+      "state_cues": [
+        "cool task",
+        "not holding target",
+        "repeated fridge actions",
+        "target not visible in fridge",
+        "unvisited surfaces remain"
+      ],
+      "retrieval_text": "cool task repeated fridge actions target missing leave fridge search surfaces",
+      "evidence": {
+        "positive_gain_count": 0,
+        "negative_gain_count": 0,
+        "source_traj_uids": [],
+        "last_updated_step": null
+      }
+    },
+    {
+      "experience_id": "exp_000024",
+      "task_type": "pick_cool_then_place_in_recep",
+      "trigger": "the cooled object has already been moved to the destination and the reward is not yet complete because another condition remains",
+      "recommended_action": "do not retrieve that cooled object; update progress and solve the remaining object or count condition",
+      "avoid_action": "take the cooled object back to the fridge and repeat cooling",
+      "expected_effect": "completed cooled placements are preserved while remaining subgoals are handled",
+      "state_cues": [
+        "cooled object visible at destination",
+        "previous move succeeded",
+        "task still active",
+        "tempted to take back object"
+      ],
+      "retrieval_text": "cooled object already destination preserve progress do not take back repeat cooling",
+      "evidence": {
+        "positive_gain_count": 0,
+        "negative_gain_count": 0,
+        "source_traj_uids": [],
+        "last_updated_step": null
+      }
+    },
+    {
+      "experience_id": "exp_000025",
+      "task_type": "look_at_obj_in_light",
+      "trigger": "the task is look at target under the desklamp and a desklamp is visible or known",
+      "recommended_action": "go to the desklamp location and use the exact admissible lamp action, commonly use desklamp 1",
+      "avoid_action": "repeatedly examine the target or desk while the lamp has not been used",
+      "expected_effect": "the light condition becomes active so the look/examine goal can complete",
+      "state_cues": [
+        "look at task",
+        "desklamp visible or known",
+        "use desklamp action admissible",
+        "lamp not yet used"
+      ],
+      "retrieval_text": "look at under desklamp use exact desklamp action before repeated examine",
+      "evidence": {
+        "positive_gain_count": 0,
+        "negative_gain_count": 0,
+        "source_traj_uids": [],
+        "last_updated_step": null
+      }
+    },
+    {
+      "experience_id": "exp_000026",
+      "task_type": "look_at_obj_in_light",
+      "trigger": "the target object is visible but not at the desklamp location",
+      "recommended_action": "take the target, go to the desk/desklamp area, and use an admissible look/use action involving the target and desklamp",
+      "avoid_action": "wander away after seeing the target or examine unrelated objects near the lamp",
+      "expected_effect": "the target and light source are brought together for the required relation",
+      "state_cues": [
+        "target visible",
+        "take action admissible",
+        "desklamp location known",
+        "look/use action needed"
+      ],
+      "retrieval_text": "visible target take carry to desklamp look use action",
+      "evidence": {
+        "positive_gain_count": 0,
+        "negative_gain_count": 0,
+        "source_traj_uids": [],
+        "last_updated_step": null
+      }
+    },
+    {
+      "experience_id": "exp_000027",
+      "task_type": "look_at_obj_in_light",
+      "trigger": "an admissible action explicitly says look at <target> under desklamp or under the desklamp",
+      "recommended_action": "select that exact action string before trying generic examine commands",
+      "avoid_action": "shorten it to look at target, use under desk, or omit the object instance number",
+      "expected_effect": "the environment receives the relation-specific action it can score",
+      "state_cues": [
+        "look at relation action admissible",
+        "target instance number visible",
+        "desklamp relation in action list"
+      ],
+      "retrieval_text": "exact look at target under desklamp admissible action no shortened action",
+      "evidence": {
+        "positive_gain_count": 0,
+        "negative_gain_count": 0,
+        "source_traj_uids": [],
+        "last_updated_step": null
+      }
+    },
+    {
+      "experience_id": "exp_000028",
+      "task_type": "look_at_obj_in_light",
+      "trigger": "the agent has examined the same cd/keychain/laptop/desk several times with Nothing happens",
+      "recommended_action": "switch to using the desklamp, taking the target, or moving to a new candidate desk/shelf location",
+      "avoid_action": "continue generic examine actions after identical no-progress feedback",
+      "expected_effect": "look-at failures recover from examine loops before reaching the step limit",
+      "state_cues": [
+        "look/examine task",
+        "repeated examine",
+        "Nothing happens",
+        "desklamp or target unresolved"
+      ],
+      "retrieval_text": "look task repeated examine nothing happens switch use desklamp take target new location",
+      "evidence": {
+        "positive_gain_count": 0,
+        "negative_gain_count": 0,
+        "source_traj_uids": [],
+        "last_updated_step": null
+      }
+    },
+    {
+      "experience_id": "exp_000029",
+      "task_type": "look_at_obj_in_light",
+      "trigger": "there are multiple desks, shelves, or candidate target instances",
+      "recommended_action": "track which target instance and desklamp location have been tried; after a failed pairing, try a new untested instance-location pair",
+      "avoid_action": "repeat the same target-desk pairing after it produced no progress",
+      "expected_effect": "the agent searches alternative valid pairings instead of looping on one cd or desk",
+      "state_cues": [
+        "multiple target instances",
+        "multiple desks or shelves",
+        "previous pairing failed",
+        "untried pair remains"
+      ],
+      "retrieval_text": "multiple desklamp target instances track tried pairs switch after failed pairing",
+      "evidence": {
+        "positive_gain_count": 0,
+        "negative_gain_count": 0,
+        "source_traj_uids": [],
+        "last_updated_step": null
+      }
+    }
+  ]
+}

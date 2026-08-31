@@ -1,0 +1,44 @@
+cff-version: 1.2.0
+message: "If you use EDGE in academic work, please cite the accompanying paper."
+title: "EDGE: Experience-Distillation for Guided Exploration in Agentic Reinforcement Learning"
+type: software
+authors:
+  - family-names: Xie
+    given-names: Can
+  - family-names: Zhou
+    given-names: Yuyi
+  - family-names: Yang
+    given-names: Wen
+  - family-names: Zhang
+    given-names: Ziyi
+  - family-names: Song
+    given-names: Siyao
+  - family-names: Deng
+    given-names: Yingzhuo
+  - family-names: Ren
+    given-names: Shuo
+  - family-names: Zhang
+    given-names: Jiajun
+repository-code: https://github.com/xvolcano02/EDGE
+preferred-citation:
+  type: article
+  title: "EDGE: Experience-Distillation for Guided Exploration in Agentic Reinforcement Learning"
+  authors:
+    - family-names: Xie
+      given-names: Can
+    - family-names: Zhou
+      given-names: Yuyi
+    - family-names: Yang
+      given-names: Wen
+    - family-names: Zhang
+      given-names: Ziyi
+    - family-names: Song
+      given-names: Siyao
+    - family-names: Deng
+      given-names: Yingzhuo
+    - family-names: Ren
+      given-names: Shuo
+    - family-names: Zhang
+      given-names: Jiajun
+  year: 2026
+  url: https://arxiv.org/abs/2608.21946

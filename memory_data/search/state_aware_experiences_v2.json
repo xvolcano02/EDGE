@@ -1,0 +1,288 @@
+{
+  "version": 2,
+  "metadata": {
+    "env": "search",
+    "updated_step": 0,
+    "source_banks": [
+      "claude_style_experiences_search.json"
+    ],
+    "generation_note": "Converted trajectory-derived search strategies into state-aware experiences grounded in question state, retrieved snippets, search history, and the search/answer action protocol.",
+    "old_bank_metadata": {
+      "source": "generated from Search agent trajectories using o3",
+      "total_memories_analyzed": 196,
+      "query_type_distribution": {
+        "direct_retrieval": {"success": 53, "failure": 26},
+        "multi_hop_reasoning": {"success": 58, "failure": 29},
+        "entity_attribute_lookup": {"success": 11, "failure": 5},
+        "comparison": {"success": 10, "failure": 4}
+      }
+    },
+    "experience_count": 24
+  },
+  "experiences": [
+    {
+      "experience_id": "exp_000001",
+      "task_type": "general",
+      "trigger": "the model is about to choose the next action",
+      "recommended_action": "emit exactly one concrete <search> query </search> or one concise <answer> answer </answer> after the think block",
+      "avoid_action": "emit both actions, leave the query as a placeholder, or put explanatory prose inside the answer",
+      "expected_effect": "the action parser accepts the turn and either retrieves evidence or terminates with a scorable answer",
+      "state_cues": ["search/answer protocol", "think block complete", "one action required", "action parser"],
+      "retrieval_text": "Search agent exact one search or answer tag concrete query concise answer valid format",
+      "evidence": {"positive_gain_count": 0, "negative_gain_count": 0, "source_traj_uids": [], "last_updated_step": null}
+    },
+    {
+      "experience_id": "exp_000002",
+      "task_type": "general",
+      "trigger": "no external evidence has been retrieved and the answer is not certain",
+      "recommended_action": "search the exact entity name together with the single fact or relation being asked for",
+      "avoid_action": "answer from uncertain memory or search the full conversational wording of the question",
+      "expected_effect": "the first result set targets the answer-bearing fact",
+      "state_cues": ["initial question", "no search history", "unknown fact", "entity and attribute identifiable"],
+      "retrieval_text": "initial search exact entity sought fact relation no evidence uncertain answer",
+      "evidence": {"positive_gain_count": 0, "negative_gain_count": 0, "source_traj_uids": [], "last_updated_step": null}
+    },
+    {
+      "experience_id": "exp_000003",
+      "task_type": "general",
+      "trigger": "the latest search results explicitly state a complete answer to the question",
+      "recommended_action": "extract the minimal answer string supported by the snippet and return it in the answer tag",
+      "avoid_action": "spend another search on the same fact or add unsupported qualifications",
+      "expected_effect": "the episode terminates promptly with an evidence-backed answer",
+      "state_cues": ["answer-bearing snippet", "entity and relation resolved", "direct wording", "enough evidence"],
+      "retrieval_text": "retrieved snippet explicitly supports complete answer stop search concise answer",
+      "evidence": {"positive_gain_count": 0, "negative_gain_count": 0, "source_traj_uids": [], "last_updated_step": null}
+    },
+    {
+      "experience_id": "exp_000004",
+      "task_type": "general",
+      "trigger": "the latest results are irrelevant, ambiguous, or repeat information already seen",
+      "recommended_action": "change the query by adding a discriminating qualifier, alternate entity name, date, title, or relation phrase",
+      "avoid_action": "repeat the identical query or merely reorder generic words",
+      "expected_effect": "the next retrieval explores a meaningfully different evidence path",
+      "state_cues": ["irrelevant snippets", "ambiguous namesake", "duplicate results", "answer absent"],
+      "retrieval_text": "irrelevant ambiguous duplicate results refine query qualifier alias date relation phrase",
+      "evidence": {"positive_gain_count": 0, "negative_gain_count": 0, "source_traj_uids": [], "last_updated_step": null}
+    },
+    {
+      "experience_id": "exp_000005",
+      "task_type": "general",
+      "trigger": "a snippet is topically relevant but does not explicitly support the needed relation or value",
+      "recommended_action": "treat it as a lead, identify the missing fact, and search that fact directly before answering",
+      "avoid_action": "infer the answer from topical proximity or from an entity merely appearing in the snippet",
+      "expected_effect": "the final answer is grounded in an explicit relation rather than a guess",
+      "state_cues": ["related entity mentioned", "needed predicate absent", "partial evidence", "tempting inference"],
+      "retrieval_text": "topically relevant partial snippet missing relation search direct evidence avoid inference",
+      "evidence": {"positive_gain_count": 0, "negative_gain_count": 0, "source_traj_uids": [], "last_updated_step": null}
+    },
+    {
+      "experience_id": "exp_000006",
+      "task_type": "general",
+      "trigger": "the question or evidence contains multiple people, works, places, or similarly named entities",
+      "recommended_action": "bind each retrieved fact to the full entity identity and use occupation, location, date, or work title to disambiguate",
+      "avoid_action": "merge facts belonging to namesakes or assume every occurrence of a surname is the same entity",
+      "expected_effect": "entity resolution remains consistent across search steps",
+      "state_cues": ["same or similar names", "multiple entities", "ambiguous pronoun", "different dates or occupations"],
+      "retrieval_text": "entity disambiguation namesake full identity occupation location date work title",
+      "evidence": {"positive_gain_count": 0, "negative_gain_count": 0, "source_traj_uids": [], "last_updated_step": null}
+    },
+    {
+      "experience_id": "exp_000007",
+      "task_type": "direct_retrieval",
+      "trigger": "the question asks one who, what, when, or where fact about a named entity",
+      "recommended_action": "search the entity plus the requested attribute in a short query, then answer as soon as a snippet states the value",
+      "avoid_action": "decompose a one-hop fact into unnecessary searches or return a broad biography",
+      "expected_effect": "direct factoid questions finish within one or two steps",
+      "state_cues": ["single named entity", "one requested fact", "who what when where", "direct lookup"],
+      "retrieval_text": "direct retrieval factoid entity attribute who what when where concise query answer",
+      "evidence": {"positive_gain_count": 0, "negative_gain_count": 0, "source_traj_uids": [], "last_updated_step": null}
+    },
+    {
+      "experience_id": "exp_000008",
+      "task_type": "direct_retrieval",
+      "trigger": "the question contains a distinctive quotation, title, lyric fragment, episode name, or unusual phrase",
+      "recommended_action": "search the distinctive phrase in quotation marks with one context word such as author, song, film, or episode",
+      "avoid_action": "search only generic surrounding terms that discard the unique phrase",
+      "expected_effect": "exact-match results identify the source efficiently",
+      "state_cues": ["quoted phrase", "title identification", "distinctive wording", "source requested"],
+      "retrieval_text": "distinctive quote title phrase exact match quotation marks author song film episode",
+      "evidence": {"positive_gain_count": 0, "negative_gain_count": 0, "source_traj_uids": [], "last_updated_step": null}
+    },
+    {
+      "experience_id": "exp_000009",
+      "task_type": "entity_attribute_lookup",
+      "trigger": "the question asks for an occupation, nationality, birthplace, genre, language, or similar attribute of an entity",
+      "recommended_action": "search the canonical entity name plus the exact attribute label and check that the snippet predicates the value of that entity",
+      "avoid_action": "return an attribute of a related person, organization, or work",
+      "expected_effect": "the entity-attribute pair is retrieved without relation confusion",
+      "state_cues": ["occupation or nationality", "birthplace", "genre or language", "named entity"],
+      "retrieval_text": "entity attribute lookup occupation nationality birthplace genre language exact predicate",
+      "evidence": {"positive_gain_count": 0, "negative_gain_count": 0, "source_traj_uids": [], "last_updated_step": null}
+    },
+    {
+      "experience_id": "exp_000010",
+      "task_type": "multi_hop_reasoning",
+      "trigger": "the question requires identifying an intermediate entity before the requested final fact can be searched",
+      "recommended_action": "solve the first relation, record the exact intermediate entity, then issue a second query for that entity and the final relation",
+      "avoid_action": "combine all hops into one overloaded query or skip the intermediate identity",
+      "expected_effect": "each search has one resolvable relation and the evidence chain stays traceable",
+      "state_cues": ["bridge question", "whose or which reference", "two relations", "intermediate entity unknown"],
+      "retrieval_text": "multi hop bridge identify intermediate entity first relation then final relation",
+      "evidence": {"positive_gain_count": 0, "negative_gain_count": 0, "source_traj_uids": [], "last_updated_step": null}
+    },
+    {
+      "experience_id": "exp_000011",
+      "task_type": "multi_hop_reasoning",
+      "trigger": "the latest results resolve one hop but the final requested attribute remains unknown",
+      "recommended_action": "carry forward only the resolved entity/value and search it with the remaining predicate",
+      "avoid_action": "repeat the first-hop query or answer with the intermediate entity when the question asks for a later fact",
+      "expected_effect": "the next step advances the chain instead of restarting it",
+      "state_cues": ["intermediate entity found", "one hop resolved", "final relation unanswered", "search step remains"],
+      "retrieval_text": "multi hop intermediate found carry forward remaining predicate do not repeat first hop",
+      "evidence": {"positive_gain_count": 0, "negative_gain_count": 0, "source_traj_uids": [], "last_updated_step": null}
+    },
+    {
+      "experience_id": "exp_000012",
+      "task_type": "multi_hop_reasoning",
+      "trigger": "two retrieved facts form a complete chain from the question entity to the requested answer",
+      "recommended_action": "verify the shared bridge entity is identical across both snippets, then return only the final endpoint value",
+      "avoid_action": "include the bridge as the answer or join facts from different namesakes",
+      "expected_effect": "the composed answer follows the supported two-hop chain",
+      "state_cues": ["first-hop evidence", "second-hop evidence", "shared bridge entity", "chain complete"],
+      "retrieval_text": "complete evidence chain shared bridge entity verify identity answer final endpoint",
+      "evidence": {"positive_gain_count": 0, "negative_gain_count": 0, "source_traj_uids": [], "last_updated_step": null}
+    },
+    {
+      "experience_id": "exp_000013",
+      "task_type": "comparison",
+      "trigger": "the question compares two entities by date, age, count, size, location, or another attribute",
+      "recommended_action": "retrieve the same comparison attribute for each entity separately, normalize units or dates, then apply the requested comparison",
+      "avoid_action": "compare different attributes or decide after finding a value for only one entity",
+      "expected_effect": "the comparison is based on symmetric evidence",
+      "state_cues": ["which is older larger earlier", "two entities", "same attribute needed", "comparison wording"],
+      "retrieval_text": "comparison two entities same attribute separately normalize dates units decide",
+      "evidence": {"positive_gain_count": 0, "negative_gain_count": 0, "source_traj_uids": [], "last_updated_step": null}
+    },
+    {
+      "experience_id": "exp_000014",
+      "task_type": "comparison",
+      "trigger": "evidence for one side of a comparison has been found but the other side is missing",
+      "recommended_action": "retain the first value and search only the second entity with the identical attribute",
+      "avoid_action": "search the first entity again or infer the second value from relative wording",
+      "expected_effect": "the remaining search fills the exact evidence gap",
+      "state_cues": ["one comparison value known", "second value unknown", "same unit required", "partial comparison"],
+      "retrieval_text": "comparison one side known search second entity identical attribute evidence gap",
+      "evidence": {"positive_gain_count": 0, "negative_gain_count": 0, "source_traj_uids": [], "last_updated_step": null}
+    },
+    {
+      "experience_id": "exp_000015",
+      "task_type": "temporal",
+      "trigger": "the question uses current, latest, first, before, after, release date, or another time-sensitive qualifier",
+      "recommended_action": "include the relevant year or temporal qualifier in the query and distinguish event date from publication or announcement date",
+      "avoid_action": "use an undated snippet or confuse a planned date with an occurred event",
+      "expected_effect": "the answer respects the question's temporal scope",
+      "state_cues": ["current or latest", "before or after", "release date", "multiple dates in snippets"],
+      "retrieval_text": "temporal current latest first before after year event date publication announcement",
+      "evidence": {"positive_gain_count": 0, "negative_gain_count": 0, "source_traj_uids": [], "last_updated_step": null}
+    },
+    {
+      "experience_id": "exp_000016",
+      "task_type": "numeric",
+      "trigger": "the answer requires a number, date, duration, rank, population, or other quantitative value",
+      "recommended_action": "extract the exact number with its unit and time reference, converting units only when the question requires it",
+      "avoid_action": "drop the unit, mix values from different years, or round away a distinction needed by the question",
+      "expected_effect": "the numerical answer is precise and contextually correct",
+      "state_cues": ["number requested", "units", "year-specific value", "multiple quantities in result"],
+      "retrieval_text": "numeric answer exact number unit date duration rank population time reference",
+      "evidence": {"positive_gain_count": 0, "negative_gain_count": 0, "source_traj_uids": [], "last_updated_step": null}
+    },
+    {
+      "experience_id": "exp_000017",
+      "task_type": "list_intersection",
+      "trigger": "the question asks which entity satisfies two separate conditions or belongs to both sets",
+      "recommended_action": "retrieve candidates for the rarer condition first, then test those candidates against the second condition",
+      "avoid_action": "search both broad conditions independently and guess an overlap",
+      "expected_effect": "the intersection is established with entity-specific evidence",
+      "state_cues": ["both conditions", "which person or work", "set intersection", "multiple candidates"],
+      "retrieval_text": "intersection both conditions candidates rarer condition verify second entity specific evidence",
+      "evidence": {"positive_gain_count": 0, "negative_gain_count": 0, "source_traj_uids": [], "last_updated_step": null}
+    },
+    {
+      "experience_id": "exp_000018",
+      "task_type": "general",
+      "trigger": "retrieved snippets disagree on a critical name, date, or number",
+      "recommended_action": "issue a disambiguating query with the full entity and disputed attribute, preferring a snippet that directly states the relation in the correct context",
+      "avoid_action": "average conflicting numbers or select the first result without resolving context",
+      "expected_effect": "the conflict is resolved before finalizing the answer",
+      "state_cues": ["conflicting snippets", "different dates or values", "same entity", "critical answer fact"],
+      "retrieval_text": "conflicting evidence name date number disambiguate direct relation correct context",
+      "evidence": {"positive_gain_count": 0, "negative_gain_count": 0, "source_traj_uids": [], "last_updated_step": null}
+    },
+    {
+      "experience_id": "exp_000019",
+      "task_type": "general",
+      "trigger": "the search history already contains enough evidence but the model is considering another broad query",
+      "recommended_action": "synthesize the existing snippets against the exact question and answer if every required relation is supported",
+      "avoid_action": "continue searching merely to accumulate more text or overwrite a supported fact with noisier results",
+      "expected_effect": "the agent avoids wasting the four-step search budget",
+      "state_cues": ["multiple useful snippets", "required facts resolved", "late search step", "broad next query"],
+      "retrieval_text": "search history enough evidence late step synthesize answer avoid unnecessary broad query",
+      "evidence": {"positive_gain_count": 0, "negative_gain_count": 0, "source_traj_uids": [], "last_updated_step": null}
+    },
+    {
+      "experience_id": "exp_000020",
+      "task_type": "general",
+      "trigger": "the current query contains many clauses and the results fail to address any clause directly",
+      "recommended_action": "reduce the next search to one entity-relation pair, starting with the dependency needed by later hops",
+      "avoid_action": "add more clauses or copy the entire multi-hop question again",
+      "expected_effect": "retrieval returns focused evidence that can seed the next hop",
+      "state_cues": ["overloaded query", "multi-clause question", "weak broad results", "unresolved dependency"],
+      "retrieval_text": "overloaded multi clause query decompose one entity relation dependency focused evidence",
+      "evidence": {"positive_gain_count": 0, "negative_gain_count": 0, "source_traj_uids": [], "last_updated_step": null}
+    },
+    {
+      "experience_id": "exp_000021",
+      "task_type": "source_identification",
+      "trigger": "the question asks who created, wrote, directed, performed, or published a named work",
+      "recommended_action": "search the exact work title plus the requested creator role and verify the role wording in the snippet",
+      "avoid_action": "return a cast member, character, editor, or similarly related person with the wrong role",
+      "expected_effect": "the answer matches the requested relationship to the work",
+      "state_cues": ["named work", "creator role", "author director performer publisher", "multiple people in snippet"],
+      "retrieval_text": "work source identification exact title creator author director performer role verify",
+      "evidence": {"positive_gain_count": 0, "negative_gain_count": 0, "source_traj_uids": [], "last_updated_step": null}
+    },
+    {
+      "experience_id": "exp_000022",
+      "task_type": "location_chain",
+      "trigger": "the question links a person or work to a city, region, country, venue, or institution through multiple relations",
+      "recommended_action": "resolve the immediate place or institution first, then search that exact entity for the requested broader location",
+      "avoid_action": "jump directly from the starting entity to a guessed country or city",
+      "expected_effect": "geographic hops preserve the requested level of granularity",
+      "state_cues": ["where located", "birthplace institution", "city country chain", "intermediate place"],
+      "retrieval_text": "location multi hop person work institution city region country resolve intermediate",
+      "evidence": {"positive_gain_count": 0, "negative_gain_count": 0, "source_traj_uids": [], "last_updated_step": null}
+    },
+    {
+      "experience_id": "exp_000023",
+      "task_type": "answer_normalization",
+      "trigger": "the evidence supports the answer but uses a longer official name, alias, abbreviation, or alternate spelling",
+      "recommended_action": "return the shortest unambiguous form that preserves the identity expected by the question",
+      "avoid_action": "include a sentence of explanation or switch to an unsupported alias",
+      "expected_effect": "the final answer is concise while remaining semantically equivalent to the evidence",
+      "state_cues": ["official long name", "alias or abbreviation", "answer known", "concise answer required"],
+      "retrieval_text": "answer normalization official name alias abbreviation shortest unambiguous concise",
+      "evidence": {"positive_gain_count": 0, "negative_gain_count": 0, "source_traj_uids": [], "last_updated_step": null}
+    },
+    {
+      "experience_id": "exp_000024",
+      "task_type": "general",
+      "trigger": "only one action step remains or repeated searches have not produced direct evidence",
+      "recommended_action": "use the strongest supported answer from the accumulated evidence if one exists; otherwise make one final highly specific entity-relation search rather than a broad retry",
+      "avoid_action": "repeat a failed query or output an answer contradicted by the snippets",
+      "expected_effect": "the final step is allocated to either a defensible answer or the most targeted remaining evidence gap",
+      "state_cues": ["late step", "repeated failed searches", "partial evidence", "one evidence gap"],
+      "retrieval_text": "last step strongest supported answer final specific entity relation search no broad retry",
+      "evidence": {"positive_gain_count": 0, "negative_gain_count": 0, "source_traj_uids": [], "last_updated_step": null}
+    }
+  ]
+}

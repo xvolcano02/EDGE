@@ -1,0 +1,12 @@
+__pycache__/
+.claude/
+.codex
+agent-trajectories/
+checkpoints/
+outputs/
+.vscode/
+logs/
+wandb/
+data/
+figs/
+**.log

@@ -1,0 +1,302 @@
+{
+  "version": 2,
+  "metadata": {
+    "env": "webshop",
+    "updated_step": 0,
+    "source_banks": [
+      "claude_style_experiences.json"
+    ],
+    "generation_note": "Converted trajectory-derived WebShop strategies into state-aware experiences grounded in WebShop observations and admissible search/click actions.",
+    "old_bank_metadata": {
+      "source": "generated from WebShop trajectories",
+      "total_memories_analyzed": 200,
+      "product_distribution": {
+        "apparel": {"success": 65, "failure": 55},
+        "footwear": {"success": 17, "failure": 7},
+        "home_decor": {"success": 5, "failure": 7},
+        "electronics": {"success": 4, "failure": 2},
+        "accessories": {"success": 4, "failure": 1},
+        "beauty_health": {"success": 3, "failure": 0},
+        "other": {"success": 22, "failure": 8}
+      }
+    },
+    "experience_count": 25
+  },
+  "experiences": [
+    {
+      "experience_id": "exp_000001",
+      "task_type": "general",
+      "trigger": "the model is about to act and the prompt shows the current admissible actions",
+      "recommended_action": "emit exactly one listed search[...] or click[...] action inside the action tag; replace the search placeholder with a concrete query",
+      "avoid_action": "invent a clickable label, copy search[<your query>] literally, or emit multiple actions",
+      "expected_effect": "the environment accepts the action and the step advances",
+      "state_cues": ["admissible actions visible", "action tag required", "search placeholder", "clickable labels"],
+      "retrieval_text": "WebShop exact admissible action action tag concrete search query valid click label",
+      "evidence": {"positive_gain_count": 0, "negative_gain_count": 0, "source_traj_uids": [], "last_updated_step": null}
+    },
+    {
+      "experience_id": "exp_000002",
+      "task_type": "general",
+      "trigger": "the current page has a search bar and no useful product results are displayed yet",
+      "recommended_action": "search for the product type plus the two or three hardest identifying constraints, using short marketplace-style keywords",
+      "avoid_action": "paste the full natural-language instruction or omit the product type",
+      "expected_effect": "results remain broad enough to contain candidates while reflecting the mandatory attributes",
+      "state_cues": ["search bar available", "instruction page", "no product candidates", "search[<your query>] admissible"],
+      "retrieval_text": "initial search bar product type hard constraints concise keyword query",
+      "evidence": {"positive_gain_count": 0, "negative_gain_count": 0, "source_traj_uids": [], "last_updated_step": null}
+    },
+    {
+      "experience_id": "exp_000003",
+      "task_type": "general",
+      "trigger": "search results are irrelevant, empty, or dominated by the wrong product category",
+      "recommended_action": "issue a revised search that keeps the product noun, removes low-value modifiers, and substitutes one useful synonym or defining attribute",
+      "avoid_action": "repeat the identical query or make the query longer with every instruction word",
+      "expected_effect": "the next result set changes and has a better chance of containing the requested category",
+      "state_cues": ["irrelevant result titles", "wrong category", "few results", "search bar still available"],
+      "retrieval_text": "irrelevant empty wrong category results refine search remove modifiers synonym",
+      "evidence": {"positive_gain_count": 0, "negative_gain_count": 0, "source_traj_uids": [], "last_updated_step": null}
+    },
+    {
+      "experience_id": "exp_000004",
+      "task_type": "general",
+      "trigger": "a results page lists several clickable products",
+      "recommended_action": "compare visible titles and prices against the product type, hard attributes, and budget, then click the strongest plausible candidate",
+      "avoid_action": "click the first result solely because one keyword matches or choose an item already visibly over budget",
+      "expected_effect": "product-page visits are spent on candidates that can satisfy the instruction",
+      "state_cues": ["multiple product titles", "item clickables", "visible prices", "search results page"],
+      "retrieval_text": "results page scan product titles prices hard constraints click best candidate",
+      "evidence": {"positive_gain_count": 0, "negative_gain_count": 0, "source_traj_uids": [], "last_updated_step": null}
+    },
+    {
+      "experience_id": "exp_000005",
+      "task_type": "general",
+      "trigger": "the current observation is a product detail page",
+      "recommended_action": "verify product identity and visible hard constraints before choosing options; inspect description or features only for required attributes not already evidenced",
+      "avoid_action": "buy immediately from a partial title match or spend steps inspecting irrelevant details",
+      "expected_effect": "wrong-category and unsupported-attribute purchases are rejected early",
+      "state_cues": ["product detail page", "description clickable", "features clickable", "buy now clickable"],
+      "retrieval_text": "product detail verify identity hard constraints description features before buy",
+      "evidence": {"positive_gain_count": 0, "negative_gain_count": 0, "source_traj_uids": [], "last_updated_step": null}
+    },
+    {
+      "experience_id": "exp_000006",
+      "task_type": "general",
+      "trigger": "the instruction requires a color, size, style, flavor, pack count, or capacity and matching option buttons are visible",
+      "recommended_action": "click every required option value exactly once and confirm the selected state in the next observation",
+      "avoid_action": "click buy now while a mandatory option is unselected or choose a near-match option",
+      "expected_effect": "the purchased variant matches the requested configuration",
+      "state_cues": ["option values clickable", "color constraint", "size constraint", "variant required"],
+      "retrieval_text": "mandatory variant option select exact color size style flavor pack capacity before buy",
+      "evidence": {"positive_gain_count": 0, "negative_gain_count": 0, "source_traj_uids": [], "last_updated_step": null}
+    },
+    {
+      "experience_id": "exp_000007",
+      "task_type": "general",
+      "trigger": "buy now is admissible and the candidate appears relevant",
+      "recommended_action": "buy only after checking product type, all explicitly requested attributes, selected variants, and the displayed price against the budget",
+      "avoid_action": "treat buy now availability as proof that the task is satisfied",
+      "expected_effect": "the terminal purchase maximizes attribute match instead of ending on a partial candidate",
+      "state_cues": ["click[buy now] admissible", "product title visible", "price visible", "selected options visible"],
+      "retrieval_text": "buy now final checklist category attributes variants price budget",
+      "evidence": {"positive_gain_count": 0, "negative_gain_count": 0, "source_traj_uids": [], "last_updated_step": null}
+    },
+    {
+      "experience_id": "exp_000008",
+      "task_type": "general",
+      "trigger": "a product violates a hard constraint or lacks evidence for a mandatory attribute",
+      "recommended_action": "return to the results with click[< prev] or click[back to search], then inspect a different candidate or refine the query",
+      "avoid_action": "select variants or buy a known mismatch because steps were already spent on it",
+      "expected_effect": "remaining steps are redirected toward a feasible item",
+      "state_cues": ["wrong product type", "price above budget", "required feature absent", "back action admissible"],
+      "retrieval_text": "product hard constraint mismatch over budget absent feature back results reject candidate",
+      "evidence": {"positive_gain_count": 0, "negative_gain_count": 0, "source_traj_uids": [], "last_updated_step": null}
+    },
+    {
+      "experience_id": "exp_000009",
+      "task_type": "general",
+      "trigger": "the same page or product has been revisited without revealing new constraint evidence",
+      "recommended_action": "stop repeating the navigation loop and choose a new product, a new results page, or a revised search query",
+      "avoid_action": "alternate indefinitely between description, features, and previous page or reopen the same rejected item",
+      "expected_effect": "the limited step budget covers new candidates rather than duplicate states",
+      "state_cues": ["identical observation", "repeated click history", "same product title", "no new evidence"],
+      "retrieval_text": "repeated page product navigation loop identical observation choose new candidate query",
+      "evidence": {"positive_gain_count": 0, "negative_gain_count": 0, "source_traj_uids": [], "last_updated_step": null}
+    },
+    {
+      "experience_id": "exp_000010",
+      "task_type": "general",
+      "trigger": "the current results page contains no good candidate and next page is admissible",
+      "recommended_action": "click next once to inspect unseen results when the query is sound; refine the search instead if the whole category is wrong",
+      "avoid_action": "page through many uniformly irrelevant results or bounce between next and previous",
+      "expected_effect": "pagination is used only when it expands a promising candidate set",
+      "state_cues": ["click[next >] admissible", "end of visible results", "query appears relevant", "no matching candidate yet"],
+      "retrieval_text": "results pagination next unseen candidates relevant query avoid next previous loop",
+      "evidence": {"positive_gain_count": 0, "negative_gain_count": 0, "source_traj_uids": [], "last_updated_step": null}
+    },
+    {
+      "experience_id": "exp_000011",
+      "task_type": "apparel",
+      "trigger": "the instruction asks for clothing with gender, material, sleeve, fit, pattern, color, or size constraints",
+      "recommended_action": "search using garment type plus the rarest material or design attribute, then verify size and color as selectable options on the detail page",
+      "avoid_action": "assume every title match offers the requested size or color",
+      "expected_effect": "the selected garment matches both descriptive and variant constraints",
+      "state_cues": ["shirt dress pants jacket", "material requirement", "size option", "color option"],
+      "retrieval_text": "apparel garment gender material sleeve fit pattern exact size color option",
+      "evidence": {"positive_gain_count": 0, "negative_gain_count": 0, "source_traj_uids": [], "last_updated_step": null}
+    },
+    {
+      "experience_id": "exp_000012",
+      "task_type": "apparel",
+      "trigger": "a clothing product page has description or features links and the requested fabric or design is not proven by the title",
+      "recommended_action": "open description or features once, verify the exact fabric/design wording, then return and configure the variant",
+      "avoid_action": "infer cotton, sleeve type, or fit from an image-like title alone",
+      "expected_effect": "hidden apparel specifications are checked before purchase",
+      "state_cues": ["apparel detail page", "fabric not in title", "description clickable", "features clickable"],
+      "retrieval_text": "apparel hidden fabric design verify description features return configure variant",
+      "evidence": {"positive_gain_count": 0, "negative_gain_count": 0, "source_traj_uids": [], "last_updated_step": null}
+    },
+    {
+      "experience_id": "exp_000013",
+      "task_type": "footwear",
+      "trigger": "the instruction requests footwear with a numeric size, color, material, or use case",
+      "recommended_action": "search by footwear type and use case/material, then select the exact size and color buttons before buying",
+      "avoid_action": "encode every size spelling into the search or assume the default variant is correct",
+      "expected_effect": "the shoe candidate remains searchable while the purchased variant meets fit constraints",
+      "state_cues": ["shoe boot sandal slipper", "numeric size", "color option", "footwear use case"],
+      "retrieval_text": "footwear shoe boot size color material use case select exact variant",
+      "evidence": {"positive_gain_count": 0, "negative_gain_count": 0, "source_traj_uids": [], "last_updated_step": null}
+    },
+    {
+      "experience_id": "exp_000014",
+      "task_type": "home_decor",
+      "trigger": "the task requests a home item with dimensions, room use, material, pattern, or color",
+      "recommended_action": "search by item type and distinctive material/pattern, then verify dimensions in the title, features, or variant controls",
+      "avoid_action": "treat approximate dimensions or a similar room category as an exact match",
+      "expected_effect": "the home item satisfies physical-size and design requirements",
+      "state_cues": ["rug curtain pillow bedding lamp", "dimensions", "material pattern", "room use"],
+      "retrieval_text": "home decor rug curtain pillow dimensions material pattern color verify exact",
+      "evidence": {"positive_gain_count": 0, "negative_gain_count": 0, "source_traj_uids": [], "last_updated_step": null}
+    },
+    {
+      "experience_id": "exp_000015",
+      "task_type": "electronics",
+      "trigger": "the task contains compatibility, connector, model, capacity, or performance requirements",
+      "recommended_action": "include the device/model and defining compatibility term in the search, then verify connector, capacity, and supported model in features before purchase",
+      "avoid_action": "buy an accessory based only on a generic product-type match",
+      "expected_effect": "the electronic item is technically compatible with the requested use",
+      "state_cues": ["charger cable adapter device", "compatibility requirement", "model number", "features clickable"],
+      "retrieval_text": "electronics compatibility device model connector capacity performance verify features",
+      "evidence": {"positive_gain_count": 0, "negative_gain_count": 0, "source_traj_uids": [], "last_updated_step": null}
+    },
+    {
+      "experience_id": "exp_000016",
+      "task_type": "accessories",
+      "trigger": "the task requests a bag, wallet, jewelry, hat, belt, or other accessory with material, dimensions, or style constraints",
+      "recommended_action": "search the exact accessory type with its most distinctive attribute and verify dimensions/material in features when absent from the title",
+      "avoid_action": "accept a visually similar accessory from a neighboring category",
+      "expected_effect": "the candidate matches accessory category and construction details",
+      "state_cues": ["bag wallet jewelry hat belt", "material", "dimensions", "style"],
+      "retrieval_text": "accessories bag wallet jewelry exact category material dimensions style verify",
+      "evidence": {"positive_gain_count": 0, "negative_gain_count": 0, "source_traj_uids": [], "last_updated_step": null}
+    },
+    {
+      "experience_id": "exp_000017",
+      "task_type": "beauty_health",
+      "trigger": "the task requests beauty or health goods with formulation, scent, body area, count, or skin/hair-use constraints",
+      "recommended_action": "search by product type plus the defining formulation/use term and verify count, scent, and intended use in features",
+      "avoid_action": "substitute a related cosmetic or infer formulation from brand language",
+      "expected_effect": "the selected product has the requested formulation and intended use",
+      "state_cues": ["skincare cosmetic soap shampoo lotion", "formulation", "scent", "pack count"],
+      "retrieval_text": "beauty health skincare formulation scent body area pack count verify features",
+      "evidence": {"positive_gain_count": 0, "negative_gain_count": 0, "source_traj_uids": [], "last_updated_step": null}
+    },
+    {
+      "experience_id": "exp_000018",
+      "task_type": "budget_constrained",
+      "trigger": "the instruction specifies a maximum price and visible candidate prices differ",
+      "recommended_action": "discard candidates whose displayed price exceeds the cap and recheck the price after selecting required variants",
+      "avoid_action": "round down an over-budget price or rely on a search-result price after the variant changes",
+      "expected_effect": "the purchased configuration remains within the explicit budget",
+      "state_cues": ["price cap", "under dollar amount", "visible price", "variant price"],
+      "retrieval_text": "budget maximum price under cap reject over budget recheck variant price",
+      "evidence": {"positive_gain_count": 0, "negative_gain_count": 0, "source_traj_uids": [], "last_updated_step": null}
+    },
+    {
+      "experience_id": "exp_000019",
+      "task_type": "multi_attribute",
+      "trigger": "the instruction includes several independent required attributes",
+      "recommended_action": "maintain a checklist separating identity, descriptive features, variant selections, and price; require evidence for every mandatory item before buying",
+      "avoid_action": "let one strong attribute match compensate for a missing hard constraint",
+      "expected_effect": "candidate evaluation follows the full conjunction of requirements",
+      "state_cues": ["multiple must-have attributes", "color and size", "feature and budget", "long instruction"],
+      "retrieval_text": "multi attribute checklist identity features variants price all mandatory conjunction",
+      "evidence": {"positive_gain_count": 0, "negative_gain_count": 0, "source_traj_uids": [], "last_updated_step": null}
+    },
+    {
+      "experience_id": "exp_000020",
+      "task_type": "search_navigation",
+      "trigger": "the results show both a plausible exact-category item and loosely related sponsored or accessory items",
+      "recommended_action": "prefer the title whose head noun is the requested product and whose qualifiers cover hard constraints",
+      "avoid_action": "choose an accessory, refill, replacement part, or bundle when the task asks for the main product",
+      "expected_effect": "the agent opens the correct product category",
+      "state_cues": ["mixed result categories", "accessory or replacement", "requested product noun", "item titles"],
+      "retrieval_text": "mixed search results exact product head noun avoid accessory refill replacement bundle",
+      "evidence": {"positive_gain_count": 0, "negative_gain_count": 0, "source_traj_uids": [], "last_updated_step": null}
+    },
+    {
+      "experience_id": "exp_000021",
+      "task_type": "product_verification",
+      "trigger": "description or features subpage is open and contains the evidence needed to judge the candidate",
+      "recommended_action": "record whether each requested attribute is supported, then click previous exactly once to return to the product page",
+      "avoid_action": "click buy now from the subpage if unavailable or reopen the same subpage without a new question",
+      "expected_effect": "evidence is retained while navigation returns to variant selection and purchase controls",
+      "state_cues": ["description subpage", "features subpage", "click[< prev] admissible", "attribute text visible"],
+      "retrieval_text": "description features subpage record evidence click previous return product page",
+      "evidence": {"positive_gain_count": 0, "negative_gain_count": 0, "source_traj_uids": [], "last_updated_step": null}
+    },
+    {
+      "experience_id": "exp_000022",
+      "task_type": "variant_selection",
+      "trigger": "several option groups are visible and one required value has already been selected",
+      "recommended_action": "preserve the confirmed selection and click the exact value in each remaining required group before buying",
+      "avoid_action": "toggle the same selected value repeatedly or choose an unrequested default in another group",
+      "expected_effect": "all required option groups reach a stable selected state",
+      "state_cues": ["multiple option groups", "selected marker", "remaining color size style", "buy now visible"],
+      "retrieval_text": "variant selection preserve selected option complete remaining groups avoid toggle",
+      "evidence": {"positive_gain_count": 0, "negative_gain_count": 0, "source_traj_uids": [], "last_updated_step": null}
+    },
+    {
+      "experience_id": "exp_000023",
+      "task_type": "product_verification",
+      "trigger": "the title contains marketing language but not an explicit requested technical or material attribute",
+      "recommended_action": "treat the attribute as unverified and inspect features or description for direct evidence",
+      "avoid_action": "convert vague terms such as premium, natural, compatible, or professional into proof of a hard constraint",
+      "expected_effect": "purchases rely on explicit evidence rather than marketing inference",
+      "state_cues": ["marketing adjectives", "attribute absent from title", "features available", "hard constraint"],
+      "retrieval_text": "marketing language not evidence verify explicit technical material attribute features description",
+      "evidence": {"positive_gain_count": 0, "negative_gain_count": 0, "source_traj_uids": [], "last_updated_step": null}
+    },
+    {
+      "experience_id": "exp_000024",
+      "task_type": "search_navigation",
+      "trigger": "a previous candidate failed only one constraint while its title revealed a better search term",
+      "recommended_action": "return to search and reuse the useful product term while replacing the failed attribute with the exact required value",
+      "avoid_action": "restart with an unrelated broad query or reopen the rejected candidate",
+      "expected_effect": "the next search exploits information learned from the near-match",
+      "state_cues": ["near-match product", "one failed constraint", "back to search available", "useful title term"],
+      "retrieval_text": "near match failed one constraint refine query useful title term exact required value",
+      "evidence": {"positive_gain_count": 0, "negative_gain_count": 0, "source_traj_uids": [], "last_updated_step": null}
+    },
+    {
+      "experience_id": "exp_000025",
+      "task_type": "general",
+      "trigger": "the remaining step budget is small and a fully verified candidate is available",
+      "recommended_action": "complete any still-missing mandatory variant selection and click buy now without unnecessary navigation",
+      "avoid_action": "continue exploring marginal alternatives after all hard constraints are satisfied",
+      "expected_effect": "the task terminates successfully before the step limit",
+      "state_cues": ["late step", "verified candidate", "all hard constraints satisfied", "buy now admissible"],
+      "retrieval_text": "low remaining steps verified candidate finish variants buy now avoid extra exploration",
+      "evidence": {"positive_gain_count": 0, "negative_gain_count": 0, "source_traj_uids": [], "last_updated_step": null}
+    }
+  ]
+}

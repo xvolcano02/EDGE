@@ -1,0 +1,36 @@
+defaults:
+  - ppo_trainer
+  - _self_
+
+checkpoint_path: null
+
+eval:
+  output_dir: eval/outputs
+  run_name: null
+  dump_trajectories: true
+
+data:
+  train_batch_size: 1
+  val_batch_size: 128
+  dataloader_num_workers: 0
+  return_raw_chat: true
+
+algorithm:
+  adv_estimator: grpo
+
+actor_rollout_ref:
+  rollout:
+    mode: sync
+
+trainer:
+  logger: ["console"]
+  project_name: alfworld_eval
+  experiment_name: checkpoint_eval
+  val_only: true
+  val_before_train: true
+  total_epochs: 1
+
+hydra:
+  run:
+    dir: .
+  output_subdir: null
